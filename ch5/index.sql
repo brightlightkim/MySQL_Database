@@ -1,0 +1,1 @@
+CREATE INDEX FirstIndex ON Flight (FlightNumber, AirlineName);
