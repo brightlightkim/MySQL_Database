@@ -32,9 +32,15 @@ create table UserMention(
 
 create table HashTag (
   hashTagID numeric primary key,
-  tweetId numeric not null unique,
-  text varchar,
-  foreign key(tweetId) references Tweet(tweetID)
+  hashTagName varchar not null unique
+);
+
+create table HashTagConnection(
+  hashTagConnectionID numeric primary key,
+  tweetID numeric not null,
+  hashTagID numeric not null,
+  foreign key(tweetID) references Tweet(tweetID),
+  foreign key(hashTagID) references HashTag(hashTagID)
 );
 
 create table FollowList (
@@ -109,8 +115,13 @@ insert into FollowList (followListID, followerID, followeeID)
 insert into UserMention (userMentionID, tweetID, text)
   values (1, 100008, "good post");
 
-insert into HashTag (hashTagID, tweetId, text)
-  values (10001, 100001, "#GoCougars");
+insert into HashTag (hashTagID, hashTagName)
+  values (1, "#GoCougars");
+
+insert into HashTagConnection(hashTagConnectionID, tweetID, hashTagID)
+  values
+  (1, 100002, 1),
+  (2, 100003, 1);
 
 insert into Profile (userID, joinedDate, location, profilePic,backgroudPic)
   values (100001, "2020-12-01", "US", "somepictureaddress", "somebackgroundpic");
@@ -145,8 +156,8 @@ SELECT User.userName, FollowList.followerID from User
   on User.userID = FollowList.followeeID;
   
 -- Q6) Count the number tweets containing the hashtag #GoCougars
-SELECT count(*) FROM Tweet
-where text LIKE '%#GoCougars%';
+SELECT count(*) FROM HashTagConnection
+  where hashTagID = (SELECT hashTagID from HashTag where hashTagName = "#GoCougars");
 
 -- Q7) Which day of the week do users tweet the most?
 select tweetDayOfWeek, max(countDay) from
